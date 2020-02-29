@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:personal_expenses_app/models/transaction.dart';
+import 'package:personal_expenses_app/widgets/chart.dart';
 import 'package:personal_expenses_app/widgets/new_transaction.dart';
 import 'package:personal_expenses_app/widgets/transaction_list.dart';
 
@@ -33,7 +34,7 @@ class MyApp extends StatelessWidget {
 }
 
 class _MyHomePage extends StatefulWidget {
-  // we are not overright the _userTransactions which is final
+  // we are not override the _userTransactions which is final
   // we can manipulate the data in the list which is allowed
   // const are use in place where the value is known
   // when the value is now known and pass in the future then use final
@@ -44,19 +45,35 @@ class _MyHomePage extends StatefulWidget {
 
 class __MyHomePageState extends State<_MyHomePage> {
   final List<Transaction> _userTransactions = [
-//    Transaction(
-//      id: 't1',
-//      title: 'New Shoes',
-//      amount: 20.99,
-//      date: DateTime.now(),
-//    ),
-//    Transaction(
-//      id: 't2',
-//      title: 'Grocery',
-//      amount: 13.99,
-//      date: DateTime.now(),
-//    ),
+    Transaction(
+      id: 't1',
+      title: 'New Shoes',
+      amount: 20.99,
+      date: DateTime.now(),
+    ),
+    Transaction(
+      id: 't2',
+      title: 'Grocery',
+      amount: 13.99,
+      date: DateTime.now(),
+    ),
   ];
+
+  // recentTransaction only have those Transaction which is only a week old
+  // where is use as a filter and return true or false if it return false
+  // then the Transaction is remove from the list. and if it return true
+  // then Transaction is added. Original List is not Affected by this.\
+  // where is return Iterable not List so make sure to convert this into List
+  // and i am not understand the logic of isAfter.
+  List<Transaction> get _recentTransaction {
+    return _userTransactions.where((tx) {
+      return tx.date.isAfter(
+        DateTime.now().subtract(
+          Duration(days: 7),
+        ),
+      );
+    }).toList();
+  }
 
   void addNewTransaction(String title, double amount) {
     final newTx = Transaction(
@@ -92,14 +109,7 @@ class __MyHomePageState extends State<_MyHomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Container(
-              width: double.infinity,
-              child: Card(
-                color: Colors.deepPurpleAccent,
-                elevation: 50,
-                child: Text('first Box'),
-              ),
-            ),
+            Chart(_recentTransaction),
             TransactionList(_userTransactions),
           ],
         ),
